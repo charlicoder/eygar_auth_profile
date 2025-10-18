@@ -16,11 +16,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libffi-dev \
     ca-certificates \
     curl \
- && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN python -m pip install --upgrade pip setuptools wheel \
- && pip wheel --no-deps --wheel-dir /wheels -r requirements.txt
+    && pip wheel --no-deps --wheel-dir /wheels -r requirements.txt
 
 COPY . /build/app
 
@@ -42,21 +42,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tini \
     ca-certificates \
     curl \
- && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 ARG APP_USER=appuser
 ARG APP_UID=1000
 RUN groupadd -g ${APP_UID} ${APP_USER} \
- && useradd -m -u ${APP_UID} -g ${APP_UID} ${APP_USER}
+    && useradd -m -u ${APP_UID} -g ${APP_UID} ${APP_USER}
 
 COPY --from=builder /wheels /wheels
 COPY --from=builder --chown=${APP_USER}:${APP_USER} /build/app /app
 
 RUN python -m venv /opt/venv \
- && /opt/venv/bin/pip install --upgrade pip \
- && /opt/venv/bin/pip install --no-index --find-links /wheels -r requirements.txt \
+    && /opt/venv/bin/pip install --upgrade pip \
+    && /opt/venv/bin/pip install --no-index --find-links /wheels -r requirements.txt \
     || /opt/venv/bin/pip install --no-cache-dir -r requirements.txt \
- && rm -rf /wheels /root/.cache/pip
+    && rm -rf /wheels /root/.cache/pip
 
 # 👇 Add this: collect static files during image build
 RUN /opt/venv/bin/python manage.py collectstatic --noinput
